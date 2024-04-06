@@ -35,14 +35,21 @@ The main objective of this project is:
 
 To achieve this objective, it was further broken down into the following 5 technical sub-objectives:
 
-0. Perform quality assurance through testing of adherence to `Rasch` model assumptions.
-1. To perform in-depth exploratory data analysis of the datasets.
-2. To engineer new predictive features from the available datasets.
-3. To develop a supervised model(s) to classify household into food secure and food insecure.
-4. To create an API endpoint for the trained model and deploy it.
+0. Perform data cleaning
+1. [X] Perform quality assurance through testing of adherence to `Rasch` model assumptions. 
+2. To perform in-depth exploratory data analysis of the datasets.
+3. To engineer new predictive features from the available datasets.
+4. To develop a supervised model(s) to classify household into food secure and food insecure.
+5. To create an API endpoint for the trained model and deploy it.
 
 ## Main Insights
+### Quality Assurance
+From the quality assurance analysis with Rasch Model to verify the validity and reliability of the FIES data, we found the following:
 
+* The weighted **infit** statistics for the FIES data in our study were within the acceptable range of [0.7–1.2], which verified that the FIES data is a reliable and valid measure to assess food insecurity in this population.
+* Mean Rasch Model `reliability` was 0.752. These levels of reliability for a scale comprising just eight items reflect reasonably good model fit.
+
+### EDA
 From the exploratory data analysis, we found out that anomalous behavviour patterns are cahracterised by:
 
 * Insight about anomaly vs normal #1
