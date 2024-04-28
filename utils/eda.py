@@ -68,29 +68,41 @@ def compute_groupby(df: pd.DataFrame, col1: str, col2: str) -> pd.DataFrame:
     return pivot_df_percentage
 
 
-def plot_grouped_data(pivot_df_percentage: pd.DataFrame, **kwargs) -> None:
+def plot_grouped_data(pivot_df_percentage: pd.DataFrame, kind="barh", **kwargs) -> None:
     # Plot the stacked bar chart
     ax = pivot_df_percentage.plot(
-        kind="barh", 
-        # stacked=kwargs["stacked"], 
-        width=0.8, figsize=(12, 5)
+        kind= kind,
+        # stacked=kwargs["stacked"],
+        width=0.8, figsize=(12, 6)
     )
 
     plt.title(kwargs["title"])
     plt.legend(title=kwargs["legend_title"], bbox_to_anchor=(1.05, 1), loc="upper left")
 
-    # Remove x-axis ticks
-    ax.xaxis.set_ticks([])
+   
     # Remove y_label
     ax.set_ylabel("")
-
+        
     # Annotate each bar with the percentages for each category
-    for p in ax.patches:
-        width, height = p.get_width(), p.get_height()
-        y, x = p.get_xy()
-        ax.annotate(
-            f"{width:.1f}%", (width, x + height / 2), ha="left", va="center", fontsize=8
-        )
+    for bar in ax.patches:
+        if kind == "barh":
+             # Remove x-axis ticks
+            ax.xaxis.set_ticks([])
+            width, height = bar.get_width(), bar.get_height()
+            y, x = bar.get_xy()
+            ax.annotate(
+                f"{width:.1f}%", (width, x + height / 2),
+                ha="left", va="center", fontsize=8)
+        else:
+            ax.yaxis.set_ticks([])
+            ax.annotate(f"{bar.get_height():.1f}%", 
+               (bar.get_x() + bar.get_width() / 2, 
+                bar.get_height()), ha='center', va='center',
+               size=7, xytext=(0, 5),
+               textcoords='offset points')
+                
+            
+    
 
     plt.tight_layout()
     plt.show()
@@ -98,15 +110,14 @@ def plot_grouped_data(pivot_df_percentage: pd.DataFrame, **kwargs) -> None:
 
 def calculate_groupby_percentage(df: pd.DataFrame, group_col: str) -> pd.DataFrame:
     """
-    Calculate the percentage of each group in a DataFrame.
+    Calculate the percentage of a col in a DataFrame.
 
     Parameters:
         df (pd.DataFrame): DataFrame containing the data.
-        group_col (str): Name of the column to group by.
-        count_col (str): Name of the column containing the count.
+        group_col (str): Name of the column to group by
 
     Returns:
-        pd.DataFrame: DataFrame with percentage calculated.
+        pd.DataFrame: DataFrame with count and percentage calculated.
     """
     # Group by the specified column and calculate count
     group_count = (
@@ -119,7 +130,7 @@ def calculate_groupby_percentage(df: pd.DataFrame, group_col: str) -> pd.DataFra
     total_count = group_count["count"].sum()
 
     # Calculate percentage of each group
-    group_count["percentage"] = round((group_count["count"] / total_count) * 100, 2)
+    group_count["percentage"] = round((group_count["count"] / total_count) * 100, 1)
 
     return group_count
 
@@ -142,7 +153,7 @@ def plot_group_by_percentage(grp_df: pd.DataFrame, grp_by_col: str, **kwargs) ->
         x="percentage",
         order=grp_df.sort_values("count", ascending=False)[grp_by_col],
         # hue="percentage",
-        palette="Spectral"
+        # palette="Spectral"
     )
 
     # Add percentage labels to the bars
