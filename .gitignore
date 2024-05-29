@@ -155,6 +155,11 @@ cython_debug/
 # user defined files
 data/ 
 
+d/
+.Rhistory
+main.py
+.virtual_documents
+
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
