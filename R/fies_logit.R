@@ -19,9 +19,9 @@ library(dplyr)
 fies_data <- read.csv("data/26052024_model_ready_data")
 
 
-
+str(fies_data)
 # subset categorical variables
-names <- c(1:4, 6:7,9:34)
+names <- c(1:4, 6:7,9:45)
 
 # Convert chr columns to categorical
 fies_data <- fies_data %>%
@@ -85,33 +85,34 @@ train <- fies_data[index_set == 1,]
 test <- fies_data[index_set == 2,]
 
 ##------------- Logistic Model -------------
+# 
+# model_03 <- glm(FI_0_3 ~  
+#                 hh_size +
+#                 crp_landsize_ha +
+#                 relevel(hh_agricactivity, ref="No") +
+#                 hh_gender +
+#                 hh_education +
+#                 # relevel(income_main_cat2, ref="Unemployed")+
+#                 relevel(income_main_cat, ref="No Employment")+
+#                   income_comp_clean+
+#                 income_more_than_one +
+#                 hh_maritalstat_clean +
+#                 hh_wealth_toilet2 +
+#                 hh_wealth_light2 +
+#                 hh_wealth_water2 +
+#                 shock_higherfoodprices +
+#                 # shock_higherfuelprices +
+#                 shock_drought + 
+#                 shock_flood +
+#                 shock_plantdisease +
+#                 shock_animaldisease +
+#                 shock_violenceinsecconf,
+#               na.action = na.omit,
+#               weights = weight_final,
+#               data = fies_data, family = "binomial")
 
-model_03 <- glm(FI_0_3 ~  
-                hh_size +
-                crp_landsize_ha +
-                relevel(hh_agricactivity, ref="No") +
-                hh_gender +
-                hh_education +
-                # relevel(income_main_cat2, ref="Unemployed")+
-                relevel(income_main_cat, ref="No Employment")+
-                  income_comp_clean+
-                income_more_than_one +
-                hh_maritalstat_clean +
-                hh_wealth_toilet2 +
-                hh_wealth_light2 +
-                hh_wealth_water2 +
-                shock_higherfoodprices +
-                # shock_higherfuelprices +
-                shock_drought + 
-                shock_flood +
-                shock_plantdisease +
-                shock_animaldisease +
-                shock_violenceinsecconf,
-              na.action = na.omit,
-              weights = weight_final,
-              data = fies_data, family = "binomial")
-
-model_06 <- glm(FI_0_6 ~  
+model_06 <- glm(FI_0_3 ~
+                  
                   hh_size +
                   crp_landsize_ha +
                   relevel(hh_agricactivity, ref="No") +
@@ -120,8 +121,7 @@ model_06 <- glm(FI_0_6 ~
                   # relevel(income_main_cat2, ref="Unemployed")+
                   relevel(income_main_cat, ref="No Employment")+
                   income_more_than_one +
-                  relevel(income_comp_clean, ref = "Increase")+
-                  hh_maritalstat_clean +
+                  # hh_maritalstatus +
                   hh_wealth_toilet2 +
                   hh_wealth_light2 +
                   hh_wealth_water2 +
@@ -139,11 +139,11 @@ model_06 <- glm(FI_0_6 ~
 
 
 
-tbl_regression(model_03, exponentiate = TRUE)
+tbl_regression(model_06, exponentiate = TRUE)
 
 
 # Improve the model with stepAIC
-model3 <- stepAIC(model_03, direction = "both")
+model3 <- stepAIC(model_06, direction = "both")
 
 
 tbl_regression(model3, exponentiate = TRUE)
