@@ -16,12 +16,23 @@ library(dplyr)
 
 
 # Load the data 
-fies_data <- read.csv("data/26052024_model_ready_data")
+fies_data <- read.csv("data/26052024_model_ready_data.csv")
+
+# Categorize rawscore to 0-3, 4-6, 7-8
+
+# Define the breaks for grouping
+breaks <- c(-Inf, 3, 6, Inf)
+
+# Define labels for the groups
+labels <- c("0-3", "4-6", "7-8")
+
+# Bin the data into groups
+fies_data$fies_cat2<- cut(fies_data$fies_rawscore, breaks = breaks, labels = labels, right = TRUE)
 
 
 str(fies_data)
 # subset categorical variables
-names <- c(1:4, 6:7,9:45)
+names <- c(1:4, 6:7,9:46,49)
 
 # Convert chr columns to categorical
 fies_data <- fies_data %>%
@@ -72,6 +83,8 @@ fies_data$hh_wealth_toilet2 <- factor(fies_data$hh_wealth_toilet2)
 fies_data$hh_wealth_water2 <- factor(fies_data$hh_wealth_water2)
 fies_data$income_main_cat2 <- factor(fies_data$income_main_cat2)
 
+fies_data$state <- factor(fies_data$state)
+
 
 str(fies_data)
 # Drop certain columns
@@ -80,39 +93,18 @@ str(fies_data)
 
 # Partition data 80% train and 20% test
 set.seed(733445)
-index_set <- sample(2, nrow(fies_data), replace = T, prob = c(0.8, 0.2))
-train <- fies_data[index_set == 1,]
-test <- fies_data[index_set == 2,]
+# index_set <- sample(2, nrow(fies_data), replace = T, prob = c(0.8, 0.2))
+# train <- fies_data[index_set == 1,]
+# test <- fies_data[index_set == 2,]
 
 ##------------- Logistic Model -------------
-# 
-# model_03 <- glm(FI_0_3 ~  
-#                 hh_size +
-#                 crp_landsize_ha +
-#                 relevel(hh_agricactivity, ref="No") +
-#                 hh_gender +
-#                 hh_education +
-#                 # relevel(income_main_cat2, ref="Unemployed")+
-#                 relevel(income_main_cat, ref="No Employment")+
-#                   income_comp_clean+
-#                 income_more_than_one +
-#                 hh_maritalstat_clean +
-#                 hh_wealth_toilet2 +
-#                 hh_wealth_light2 +
-#                 hh_wealth_water2 +
-#                 shock_higherfoodprices +
-#                 # shock_higherfuelprices +
-#                 shock_drought + 
-#                 shock_flood +
-#                 shock_plantdisease +
-#                 shock_animaldisease +
-#                 shock_violenceinsecconf,
-#               na.action = na.omit,
-#               weights = weight_final,
-#               data = fies_data, family = "binomial")
+summary(glm(FI_0_6 ~hh_gender,
+    na.action = na.omit,
+    weights = weight_final,
+    data = fies_data, family = "binomial"))
 
-model_06 <- glm(FI_0_3 ~
-                  
+model_06 <- glm(FI_0_6 ~
+                  state+
                   hh_size +
                   crp_landsize_ha +
                   relevel(hh_agricactivity, ref="No") +
@@ -121,12 +113,9 @@ model_06 <- glm(FI_0_3 ~
                   # relevel(income_main_cat2, ref="Unemployed")+
                   relevel(income_main_cat, ref="No Employment")+
                   income_more_than_one +
-                  # hh_maritalstatus +
-                  hh_wealth_toilet2 +
-                  hh_wealth_light2 +
-                  hh_wealth_water2 +
+                  income_main_control+
+                  hh_maritalstat_clean +
                   shock_higherfoodprices +
-                  # shock_higherfuelprices +
                   shock_drought + 
                   shock_flood +
                   shock_plantdisease +
@@ -136,14 +125,14 @@ model_06 <- glm(FI_0_3 ~
               weights = weight_final,
               data = fies_data, family = "binomial")
 
-
-
+summary(model_06)
 
 tbl_regression(model_06, exponentiate = TRUE)
 
 
+
 # Improve the model with stepAIC
-model3 <- stepAIC(model_06, direction = "both")
+model3 <- step(model_06, direction = "both")
 
 
 tbl_regression(model3, exponentiate = TRUE)
@@ -161,10 +150,26 @@ anova(null_model, model_06, test = "Chisq")
 
 
 ## ------------------------ No Multicollinearity -------------------
-vif(model1)
+vif(model3)
 
 
-
+## --------------------------- Uni variate ----------------------------------
+fies_data %>%
+  select(state, 
+         FI_0_6) %>%
+  tbl_uvregression(
+    method = glm,
+    y = FI_0_6,
+    method.args = list(family = binomial),
+    exponentiate = TRUE,
+    pvalue_fun = ~ style_pvalue(.x, digits = 2)
+  ) %>%
+  add_global_p() %>% # add global p-value
+  add_nevent() %>% # add number of events of the outcome
+  bold_p() %>% # bold p-values under a given threshold (default 0.05)
+  bold_labels()
+#> add_q: Adjusting p-values with
+#> `stats::p.adjust(x$table_body$p.value, method = "fdr")`
 
 
 
