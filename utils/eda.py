@@ -1,5 +1,7 @@
 # Define utility function
 
+
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -196,6 +198,8 @@ def plot_grouped_data(
                 ha="left",
                 va="center",
                 fontsize=8,
+                color='black',
+                fontfamily='Times New Roman'
             )
         else:
             ax.yaxis.set_ticks([])
@@ -207,6 +211,8 @@ def plot_grouped_data(
                 size=7,
                 xytext=(0, 5),
                 textcoords="offset points",
+                color='black',
+                fontfamily='Times New Roman'
             )
 
     plt.tight_layout()
