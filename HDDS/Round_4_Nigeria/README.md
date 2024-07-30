@@ -31,10 +31,14 @@ Household Dietary Diversity (HDD) Status
 * Total Income ($)
 * Food Insecurity Experience Scale (FIES)
 
+### EDA
+From the exploratory data analysis, we found out the following:
+
+
 # Descriptive Statistic Tables
 * Descriptive statistics for hdds categories and their p values
-* Table 5: Household dietary diversity category
-* Table 4: Comparison of HDDS by State
+* Household dietary diversity category
+* Comparison of HDDS by State
 
 # Modelling 
 [Ordinal logistic regression](https://cscu.cornell.edu/wp-content/uploads/91_ordlogistic.pdf) model was

@@ -16,9 +16,7 @@ library(dplyr)
 
 
 # Load the data 
-fies_data <- read.csv("data/26052024_model_ready_data.csv")
-
-
+fies_data <- read.csv("data/DIEM_NG/26052024_model_ready_data.csv")
 
 
 # Categorize rawscore to 0-3, 4-6, 7-8
@@ -110,6 +108,8 @@ table(fies_data$income_main_cat2)
 
 ## --------------------------- Uni variate ----------------------------------
 fies_data$hh_agricactivity <- relevel(fies_data$hh_agricactivity, ref = "No")
+fies_data$income_main_control <- relevel(fies_data$income_main_control, ref = "2")
+fies_data$hh_education <- relevel(fies_data$hh_education, ref = "No Education")
 
 fies_data$income_main_cat <- relevel(fies_data$income_main_cat, ref = "No Employment")
 
@@ -146,7 +146,7 @@ model_06 <- glm(FI_0_6 ~
                   state+
                   # hh_size +
                   crp_landsize_ha +
-                  relevel(hh_agricactivity, ref="No") +
+                  hh_agricactivity+
                   hh_gender +
                   hh_education +
                   # income_main_cat2+

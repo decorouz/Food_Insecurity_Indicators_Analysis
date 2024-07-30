@@ -85,7 +85,7 @@ compared to the same period in a typical year.
     - Increase or decrease in harvest area is associated with increase or decrease in main income. **Is this relationship significant?** Yes
 * **Crop Production Difficulty**: Crop production difficulties were reported by 75 percent of the crop producers.
     - These included access to fertilizer (81 percent) – especially in Katsina (96 percent), Borno (84 percent) and Zamfara (71 percent)
-    - Householf that reported crop production difficulties experience higher decrease in their crop harvested area compared to those who didn't experience difficulty. Is the relationship significant?
+    - Household that reported crop production difficulties experience higher decrease in their crop harvested area compared to those who didn't experience difficulty. Is the relationship significant?
     - Households who reported crop production difficulty reported a decrease in main income. And the association is significant at 0.05 p value.
     - There is slight proportion of household that experience decrease in harvested area as a result of difficulty accessing fertilizer. And the difference is statistically siginicant. 
 * **Livestock Production Difficulties**: About 56 percent of the households surveyed were livestock producers.

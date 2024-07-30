@@ -1,4 +1,4 @@
-setwd("~/Documents/Dev/Python Programming/Data Science/data_science_with_python")
+setwd("~/Documents/Dev/Python Programming/Data Science/data_science_with_python/HDDS/Round_4_Nigeria")
 
 
 # Load the neccessary libraries
@@ -11,7 +11,7 @@ library("haven")
 
 
 #--------- Load the data ----------------------
-hdds_data <- read.csv("data/hdds_round4_data.csv")
+hdds_data <- read.csv("../../data/DIEM_NG/hdds_round4_data.csv")
 
 # ------ Demographic and Socioeconomic Descriptive----- 
 
@@ -50,7 +50,7 @@ hdds_data$land_size_normalized <- min_max_normalize(hdds_data$crp_landsize_ha)
 # Convert the response variable to an ordered factor
 hdds_data$response <- ordered(hdds_data$hdds_class, levels = c("Low", "Medium", "High"))
 
-
+str(hdds_data)
 # ----- Descriptive for FCS- -----------
 # 0 - 21 : Poor
 # 21.5 - 35 : Borderline
@@ -94,6 +94,13 @@ attributes(hdds_data$FI_0_6)$label <- "Food insecurity scale"
 # attributes(hdds_data$hh_wealth_light2)$label <- "Access to Electricity"
 # attributes(hdds_data$hh_wealth_water2)$label <- "Access to Safe Water"
 # attributes(hdds_data$hh_wealth_toilet2)$label <- "Access to Sanitation"
+
+# ------------Set reference -----
+hdds_data$hh_agricactivity <- relevel(hdds_data$hh_agricactivity, ref = "No")
+# hdds_data$income_main_control <- relevel(hdds_data$income_main_control, ref = "2")
+hdds_data$hh_education <- relevel(hdds_data$hh_education, ref = "No Education")
+# hdds_data$income_main_cat <- relevel(hdds_data$income_main_cat, ref = "No Employment")
+
 
 
 
@@ -156,7 +163,7 @@ design.hdds %>%
   bold_labels()
   # add_overall()
 
-str(hdds_data)
+
 
 
 #------ Table 1: Comparison of household dietary diversity categories HDDS (categorical explanatory variables)
@@ -244,7 +251,7 @@ design.hdds %>%
   ) %>%
   modify_header(label = "**Variable**",
                 all_stat_cols() ~ "**{level}**<br>N = {n} ({style_percent(p, digits=1)}%)") %>%
-  modify_caption("Weighted descriptive statistics,") 
+  modify_caption("Weighted descriptive statistics,") %>% 
   bold_labels()
 
 
@@ -289,34 +296,98 @@ hdds_poison <- svyglm(hdds_score~
                         FI_0_6,
                design=design.hdds, family=poisson())
 
-tbl_regression(hdds_poison)
 
 
-# ====== Ordinal Logistic Regression -======
+summary(hdds_poison, df.resid = degf(design.hdds))
 
-# --------------------- VGAM Ordinal Logistic Regresion ---
-library(VGAM)
-# Fit the vector generalized linear model
+# Calculating the VIF
+library(car)
+vif_values <- vif(hdds_poison)
+#----------------- Tidy the model summary
+library(broom)
+library(knitr)
+library(dplyr)
+library(kableExtra)
+
+
+tidy_hdds<- tidy(hdds_poison)
+
+# Add asterisks for different significance levels and combine estimate and standard error with HTML line breaks
+tidy_hdds <- tidy_hdds %>%
+  mutate(
+    p.value = round(p.value, 4),
+    estimate_se = case_when(
+      p.value < 0.001 ~ paste0(format(round(estimate, 4), nsmall = 4), "***", "<br>(", round(std.error, 4), ")"),
+      p.value < 0.01 ~ paste0(format(round(estimate, 4), nsmall = 4), "**", "<br>(", round(std.error, 4), ")"),
+      p.value < 0.05 ~ paste0(format(round(estimate, 4), nsmall = 4), "*", "<br>(", round(std.error, 4), ")"),
+      p.value > 0.05 ~ paste0(format(round(estimate, 4), nsmall = 4), "<br>(", round(std.error, 4), ")"),
+      p.value > 0.05 ~ paste0(format(round(estimate, 4), nsmall = 4), "<br>(", round(std.error, 4), ")"),
+      TRUE ~ format(round(estimate, 4), nsmall = 4)
+    ),
+    statistic = round(statistic, 4)
+  )
+
+# Select and arrange columns for the final table
+tidy_hdds <- tidy_hdds %>%
+  select(term, estimate_se, p.value)
+
+# Format the table using kable and kableExtra for additional styling
+tidy_hdds %>%
+  kable(
+    format = "html",
+    escape = FALSE, # Allow HTML tags
+    col.names = c("Term", "Estimate<br>(Std Error)", "P value"),
+    caption = "Logistic Regression Results"
+  ) %>%
+  kable_styling(full_width = FALSE, position = "center")
 
 
 
+# ----------------Ordinal Least Square Regression ----------------
+ols_hdds <- svyglm(hdds_score~
+                        state+
+                        hh_size +
+                        hh_agricactivity +
+                        hh_education +
+                        income_dollar_normalized +
+                        shock_climate+
+                        FI_0_6,
+                      design=design.hdds)
 
-fit_vglm <- vglm(response ~ state+
-                   hh_size +
-                   
-                   relevel(hh_agricactivity, ref="No") +
-                   hh_gender +
-                   hh_education +
-                   land_size_normalized+
-                   income_dollar_normalized +
-                   FI_0_6,
-                  
-                 family = cumulative(link = "probitlink", parallel = TRUE),
-                 weights = weight_final,
-                 data = hdds_data)
+tidy_ols_hdds<- tidy(ols_hdds)
 
-# Summary of the model
-summary(fit_vglm)
+tidy_ols_hdds <- tidy_ols_hdds %>%
+  mutate(
+    p.value = round(p.value, 4),
+    estimate_se = case_when(
+      p.value < 0.001 ~ paste0(format(round(estimate, 4), nsmall = 4), "***", "<br>(", round(std.error, 4), ")"),
+      p.value < 0.01 ~ paste0(format(round(estimate, 4), nsmall = 4), "**", "<br>(", round(std.error, 4), ")"),
+      p.value < 0.05 ~ paste0(format(round(estimate, 4), nsmall = 4), "*", "<br>(", round(std.error, 4), ")"),
+      p.value > 0.05 ~ paste0(format(round(estimate, 4), nsmall = 4), "<br>(", round(std.error, 4), ")"),
+      p.value > 0.05 ~ paste0(format(round(estimate, 4), nsmall = 4), "<br>(", round(std.error, 4), ")"),
+      TRUE ~ format(round(estimate, 4), nsmall = 4)
+    ),
+    statistic = round(statistic, 4)
+  )
+
+# Select and arrange columns for the final table
+tidy_ols_hdds <- tidy_ols_hdds %>%
+  select(term, estimate_se, p.value)
+
+# Format the table using kable and kableExtra for additional styling
+tidy_ols_hdds %>%
+  kable(
+    format = "html",
+    escape = FALSE, # Allow HTML tags
+    col.names = c("Term", "Estimate<br>(Std Error)", "P value"),
+    caption = "OLS Regression Results for determinant of HDDS"
+  ) %>%
+  kable_styling(full_width = FALSE, position = "center")
+
+# ------ End of OLS regression -------------
+
+
+
 
 # --------- Magnitude and Determinant of Animal Source Food---------
 
