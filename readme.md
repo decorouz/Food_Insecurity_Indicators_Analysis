@@ -1,4 +1,4 @@
-![Food insecurity](data/food_insecurity.jpg)
+![Food insecurity](assets/food_insecurity.jpg)
 # Food Insecurity: Determinants of Household Food Insecurity
 
 Billions of people suffer from food insecurity. What does it mean to be food insecure? In this repository, we explore the determinants of houshold and individual Food Insecurity in Nigeria.
