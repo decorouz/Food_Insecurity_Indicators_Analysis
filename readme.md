@@ -53,7 +53,12 @@ This projects aim to analyze various food insecurity indicators, including the H
 Zero Hunger, Data Collection, Data Analysis, Statistical Inferences
 
 # Acknowledgments/References
-> Hannah Ritchie (2023) - “How is food insecurity measured?” Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/food-insecurity' [Online Resource]
+> * Hannah Ritchie (2023) - “How is food insecurity measured?” Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/food-insecurity' [Online Resource]
+> * SDG Indicator 2.1.2 – Using the Food Insecurity Experience Scale (FIES) - “Statistical validation of FIES
+data” Published online at OurWorldInData.org. Retrieved from: [Online Resource](https://elearning.fao.org/pluginfile.php/491591/mod_scorm/content/5/story_content/external_files/SDG2.1.2_lesson3.pdf)
+> * Nord, M. 2014. Introduction to Item Response Theory applied to Food Security Measurement:
+Basic Concepts, Parameters, and Statistics. Technical Paper, FAO, Rome.
+(available at http://www.fao.org/economic/ess/ess-fs/voices/en)  
 
 # License
 Specify the license under which your code is released. Moreover, provide the licenses associated with the dataset you are using. This is important for others to know if they want to use or contribute to your project. 
