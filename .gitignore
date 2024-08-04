@@ -154,6 +154,7 @@ cython_debug/
 
 # user defined files
 data/ 
+FIES/MISC_NG_6/processed_data/
 
 d/
 .Rhistory
