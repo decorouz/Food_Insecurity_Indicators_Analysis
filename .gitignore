@@ -155,6 +155,7 @@ cython_debug/
 # user defined files
 data/ 
 FIES/MISC_NG_6/processed_data/
+FIES/MISC_NG_6/notebooks/2_rasch_model_endbadgov.ipynb
 
 d/
 .Rhistory
