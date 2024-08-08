@@ -1,8 +1,8 @@
 # Define utility function
 
 
-
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -198,8 +198,8 @@ def plot_grouped_data(
                 ha="left",
                 va="center",
                 fontsize=8,
-                color='black',
-                fontfamily='Times New Roman'
+                color="black",
+                fontfamily="Times New Roman",
             )
         else:
             ax.yaxis.set_ticks([])
@@ -211,14 +211,15 @@ def plot_grouped_data(
                 size=7,
                 xytext=(0, 5),
                 textcoords="offset points",
-                color='black',
-                fontfamily='Times New Roman'
+                color="black",
+                fontfamily="Times New Roman",
             )
 
     plt.tight_layout()
     plt.show()
 
 
+#################Calculate Weighted Percentage of a Column in a DataFrame#############################
 def calculate_weighted_percentage(
     df: pd.DataFrame, group_col: str, weight_col: str
 ) -> pd.DataFrame:
@@ -244,10 +245,13 @@ def calculate_weighted_percentage(
 
     # Calculate percentage of each group
     group_weight_sum["percentage"] = round(
-        (group_weight_sum["weighted_sum"] / total_weight) * 100, 1
+        (group_weight_sum["weighted_sum"] / total_weight), 3
     )
 
     return group_weight_sum
+
+
+############################################################################################
 
 
 def plot_group_by_percentage(grp_df: pd.DataFrame, grp_by_col: str, **kwargs) -> None:
@@ -368,3 +372,97 @@ def all_top_crp_diff_by_state(df, subset: list):
     percentage_columns = [col for col in subset]
     all_shocks_by_state = grouped[percentage_columns]
     return all_shocks_by_state
+
+
+################Handling Outlier #########################
+
+# Identifying outliers using IQR and zsocre methods
+
+
+def outlier_infor_iqr(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """
+    Identifies and handles outliers in a specified column of a DataFrame using the Interquartile Range (IQR) method.
+
+    This function calculates the IQR for the values in the specified column and identifies outliers
+    as those values that fall below Q1 - 1.5 * IQR or above Q3 + 1.5 * IQR. It then replaces these
+    outliers with the median value of the column.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The input DataFrame containing the data.
+    column : str
+        The name of the column in which to identify and handle outliers.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A new DataFrame with outliers in the specified column replaced by the median value of the column.
+    """
+
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    # Count the number of outlier records
+    print("Outliers records using IQR:")
+    print(np.sum((df.loc[:, column] < lower_bound) | (df.loc[:, column] > upper_bound)))
+
+    df1 = df.copy()
+
+    median = df[column].median()
+    df1[f"{column}_clean_iqr"] = np.where(
+        (df1[column] > upper_bound) | (df1[column] < lower_bound), median, df1[column]
+    )
+    return df1
+
+
+#####################################
+def outlier_info_zscore(
+    df: pd.DataFrame, column: str, z_thresh: float = 2.5
+) -> pd.DataFrame:
+    """
+    Identifies and handles outliers in a specified column of a DataFrame using the Z-score method.
+
+    This function calculates the Z-scores for the values in the specified column and identifies outliers
+    as those values with an absolute Z-score greater than the specified threshold. It then replaces these
+    outliers with the mean value of the non-outlier data points in the column.
+
+    Note
+    ----
+
+    Replace outlier values with the mean (where the mean is calculated excluding the outlier values)
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The input DataFrame containing the data.
+    column : str
+        The name of the column in which to identify and handle outliers.
+    z_thresh : float, optional
+        The Z-score threshold for identifying outliers. Default is 2.5.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A new DataFrame with outliers in the specified column replaced by the mean value of the non-outlier data points.
+    """
+    from scipy import stats
+
+    # Count the number of outlier records
+    print("Outliers records using ZSCORE:")
+    print(np.sum(np.abs(stats.zscore(df[column])) > z_thresh))
+
+    df1 = df.copy()
+
+    df1[f"{column}_outlier_z"] = np.abs(df1[column]) > z_thresh
+    df1[f"{column}_mean"] = df1[df1[f"{column}_outlier_z"] == False][column].mean()
+    df1[f"{column}_clean"] = np.where(
+        df1[f"{column}_outlier_z"] == True, df1[f"{column}_mean"], df1[column]
+    )
+    return df1.drop(columns=[f"{column}_outlier_z", f"{column}_mean"], axis=1)
+
+
+###############################################
