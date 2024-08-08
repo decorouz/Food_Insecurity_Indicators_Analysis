@@ -91,6 +91,8 @@ attributes(hdds_data$response)$label <- "HDDS category"
 attributes(hdds_data$hdds_score)$label <- "HDDS score"
 attributes(hdds_data$fcg)$label <- "FCS Categories: 21/35 thresholds"
 attributes(hdds_data$FI_0_6)$label <- "Food insecurity scale"
+attributes(hdds_data$fies_cat)$label <- "Food insecurity category"
+
 # attributes(hdds_data$hh_wealth_light2)$label <- "Access to Electricity"
 # attributes(hdds_data$hh_wealth_water2)$label <- "Access to Safe Water"
 # attributes(hdds_data$hh_wealth_toilet2)$label <- "Access to Sanitation"
@@ -114,7 +116,6 @@ hdds_data$hh_education <- relevel(hdds_data$hh_education, ref = "No Education")
 
 
 
-
 design.hdds <- svydesign(id=~1, weights=~weight_final, data=hdds_data)
 
 
@@ -127,7 +128,7 @@ design.hdds %>%
     include = c(state, crp_landsize_ha,land_size_normalized,
                 hh_size, tot_income, tot_income_dollar,
                 hh_age, hh_gender, hh_agricactivity, hh_education,
-                FI_0_6,
+                FI_0_6,fies_cat,
                 hdds_score, response,
                 shock_climate),
     statistic = list(all_continuous()  ~ "{mean} ± {sd}",
