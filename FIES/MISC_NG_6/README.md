@@ -1,5 +1,5 @@
 # Determinants of Household Food Insecurity Amongst Urban Household in Nigeria
-A multilvel multinorminal logistic regression and mixed effect analysis to assess factors associated with household food insecurity in Nigeria
+A multilvel multinorminal logistic regression and mixed effect analysis to assess factors associated with household food insecurity in Urban Nigeria
 
 ## Predictors and Hypothesis
 1. Wealth index
@@ -7,13 +7,13 @@ A multilvel multinorminal logistic regression and mixed effect analysis to asses
 4. Household Head Gender, Age, Education,
 4. Household own dwelling
 4. Household livestock ownership
-5. Number of women
-6. Number of men
-7. Number of child under 5
-8. Household women who attended school`"hh_wm_attended_sch_num",`
-9. Household women average age `hh_wm_mean_age_yrs`
-10. Number of women who attended as least sec school
-11. Household women mean life satisfaction `hh_wm_mean_life_satisfaction`
+5. Number of women.
+6. Number of men.
+7. Number of child under 5.
+8. Household women who attended school`"hh_wm_attended_sch_num",`.
+9. Household women average age `hh_wm_mean_age_yrs`.
+10. Number of women who attended as least sec school.
+11. Household women mean life satisfaction `hh_wm_mean_life_satisfaction`.
 8. Household men who attended school`"hh_mn_attended_sch_num",`
 9. Household men average age `hh_mn_mean_age_yrs`
 10. Number of men who attended as least sec school
@@ -26,6 +26,17 @@ This study is based on quantitative cross-sectional data derived from the Nigeri
 The survey utilized a multistage stratified cluster sampling approach that employed a probability proportional to size to select enumeration areas in the first stage based on the 2006 Population and Housing Census of the Federal Republic of Nigeria (NPHC). In the second stage, 20 households were randomly selected within each enumeration area.
 
 The downloaded data include survey data from **MICS** or NICS. For this project we shall use the MICS only.
+
+### Men (15-19 years of age)
+The respond were sampled from 12,036 households.
+* Before cleaning:
+        Cases: 18466
+        Variables: 233
+* After cleaning:
+Remove cases that didn't provide the correct consent
+        Cases: 17347
+        Variables: 17
+        
 
 ## Data Processing/Cleaning
 **Predictors**
