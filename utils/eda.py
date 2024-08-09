@@ -466,3 +466,153 @@ def outlier_info_zscore(
 
 
 ###############################################
+
+def chi_square_test(df, var, fi_var1="FI_sev", fi_var2="FI_mod_sev"):
+    import pandas as pd
+    from scipy.stats import chi2_contingency
+    """
+    Perform Chi-Square tests on two variables against a common categorical variable.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame containing the data.
+    var1 : str
+        The name of the first binary variable (e.g., 'FI_sev').
+    var2 : str
+        The name of the second binary variable (e.g., 'FI_mod_sev').
+    common_var : str
+        The name of the common categorical variable to test against (e.g., 'hhsex').
+
+    Returns
+    -------
+    dict
+        A dictionary with the variable names as keys and their corresponding p-values as values.
+
+    """
+    # Create contingency tables
+    contingency_table_var1 = pd.crosstab(df[fi_var1], df[var])
+    contingency_table_var2 = pd.crosstab(df[fi_var2], df[var])
+
+    # Perform Chi-Square tests
+    p_value_var1 = chi2_contingency(contingency_table_var1)[1]
+    p_value_var2 = chi2_contingency(contingency_table_var2)[1]
+
+    # Return a dictionary of p-values
+    return {
+        f"P-value {fi_var1}": p_value_var1,
+        f"P-value {fi_var2}": p_value_var2,
+    }
+
+
+#######################################
+# unweighted  version
+def process_fies_question_data(df, weight_col='hhweightmics', col='zone'):
+    """
+    Processes the FIES data to convert it from wide to long format, filter responses, and compute cross-tabulations.
+
+    Parameters:
+    - df (pd.DataFrame): The input DataFrame containing the FIES data.
+    - weight_col (str): The name of the column containing weights. Default is 'hhweightmics'.
+    - col (str): The name of the column containing zones. Default is 'zone'.
+    Returns:
+    - cross_tab (pd.DataFrame): Cross-tabulation of counts.
+    - cross_tab_prop (pd.DataFrame): Cross-tabulation of proportions.
+    """
+    question_cols = ["WORRIED", "HEALTHY", "FEWFOOD", "SKIPPED", "ATELESS", "RANOUT", "HUNGRY", "WHLDAY"]
+    # Select relevant columns
+    fies_qest = df.loc[:, question_cols + [weight_col, col]]
+
+    # Convert from wide to long format
+    fies_long = pd.melt(fies_qest, id_vars=[weight_col, col], 
+                             var_name='Question', value_name='Response',
+                             value_vars=question_cols)
+
+    # Filter responses where Response is 1
+    fies_yes = fies_long.query("Response == 1")
+
+    # Compute cross-tabulations
+    cross_tab = pd.crosstab(index=fies_yes["Question"], columns=fies_yes[col])
+    cross_tab_prop = pd.crosstab(index=fies_yes['Question'], columns=fies_yes[col], normalize='index')
+
+    return cross_tab_prop, cross_tab
+
+#######################################################################
+
+
+# Weighted version
+def process_fies_question_data_wt(df, weight_col='hhweightmics', col='zone'):
+    """
+    Processes the FIES data to convert it from wide to long format, filter responses, and compute weighted cross-tabulations.
+
+    Parameters:
+    - df (pd.DataFrame): The input DataFrame containing the FIES data.
+    - weight_col (str): The name of the column containing weights. Default is 'hhweightmics'.
+    - col (str): The name of the column containing zones. Default is 'zone'.
+    
+    Returns:
+    - cross_tab_prop (pd.DataFrame): Weighted cross-tabulation of proportions.
+    - cross_tab (pd.DataFrame): Weighted cross-tabulation of counts.
+    """
+    question_cols = ["WORRIED", "HEALTHY", "FEWFOOD", "SKIPPED", "ATELESS", "RANOUT", "HUNGRY", "WHLDAY"]
+
+    # Select relevant columns
+    fies_qest = df.loc[:, question_cols + [weight_col, col]]
+
+    # Convert from wide to long format
+    fies_long = pd.melt(fies_qest, id_vars=[weight_col, col], 
+                        var_name='Question', value_name='Response',
+                        value_vars=question_cols)
+
+    # Filter responses where Response is 1
+    fies_yes = fies_long.query("Response == 1")
+
+    # Compute the unweighted cross-tabulations
+    cross_tab = pd.crosstab(index=fies_yes["Question"], columns=fies_yes[col])
+    
+    # Compute weighted cross-tabulations
+    cross_tab_wt = pd.crosstab(index=fies_yes["Question"], 
+                            columns=fies_yes[col], 
+                            values=fies_yes[weight_col], 
+                            aggfunc='sum')
+
+    cross_tab_prop = cross_tab_wt.div(cross_tab_wt.sum(axis=1), axis=0)
+
+    return cross_tab_prop, cross_tab
+
+#############################################
+def plot_fies_item_stacked_bar(cross_tab_prop, cross_tab, **kwargs):
+    """
+    Plots a 100% stacked bar plot with annotations.
+    
+    Parameters:
+    - cross_tab (pd.DataFrame): DataFrame with raw counts for each category.
+    - cross_tab_prop (pd.DataFrame): DataFrame with proportions for each category.
+    - title (str): Title of the plot.
+    """
+
+    # Create the 100% stacked bar plot
+    ax = cross_tab_prop.plot(kind='barh', 
+                             stacked=True, 
+                             figsize=(10, 7))
+
+    # Customize the plot
+    plt.legend(loc="lower left", ncol=1, bbox_to_anchor=(1, 0.5))
+    plt.xticks([])
+    plt.ylabel("")
+    plt.xlabel("")
+    plt.title(kwargs["title"])
+
+    # Add annotations
+    for n, x in enumerate(cross_tab.index):
+        for (proportion, count, y_loc) in zip(cross_tab_prop.loc[x],
+                                              cross_tab.loc[x],
+                                              cross_tab_prop.loc[x].cumsum()):
+            plt.text(x=(y_loc - proportion) + (proportion / 2),
+                     y=n - 0.11,
+                     s=f'{count}\n({np.round(proportion * 100, 1)}%)', 
+                     color="black",
+                     fontsize=6,
+                     fontweight="bold")
+
+    plt.show()
