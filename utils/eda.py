@@ -8,7 +8,7 @@ import seaborn as sns
 
 
 ## Bivariate Analysis FIES with socio-demographic, shock and difficulty
-def fies_by_socio_demo(df, col):
+def fies_by_socio_demo(df, col, FI_mod_sev="prob_mod_sev", FI_sev="prob_sev", wt="weight_final"):
     """
     Perform bivariate analysis of RFI by socio-demographic factors.
 
@@ -23,8 +23,8 @@ def fies_by_socio_demo(df, col):
     # Melt the DataFrame
     melted_df = pd.melt(
         df,
-        id_vars=[col, "weight_final"],
-        value_vars=["prob_mod_sev", "prob_sev"],
+        id_vars=[col, wt],
+        value_vars=[FI_mod_sev, FI_sev],
         var_name="RFI_level",
         value_name="prob_value",
     )
@@ -35,8 +35,8 @@ def fies_by_socio_demo(df, col):
         .agg(
             percentage=(
                 "prob_value",
-                lambda x: (x * melted_df.loc[x.index, "weight_final"] * 100).sum()
-                / melted_df.loc[x.index, "weight_final"].sum(),
+                lambda x: (x * melted_df.loc[x.index, wt] * 100).sum()
+                / melted_df.loc[x.index, wt].sum(),
             )
         )
         .reset_index()
@@ -45,7 +45,9 @@ def fies_by_socio_demo(df, col):
 
 
 # Plot the RFI levels by different variables such as state, gender etc
-def plot_fies_levels_by_vars(grp_df, var="state", kind="bar", figsize=(7, 4), **kwargs):
+# Usage: grp_df = fies_by_socio_demo.groupby(["zone", "RFI_level"], observed=True)["percentage"].sum().unstack()
+# This function works with the output of the function above `fies_by_socio_demo`
+def plot_fies_levels_by_vars(grp_df, var="state", sortby_col="prob_mod_sev", kind="bar", figsize=(7, 4), title=None):
     """
     Plot barplot showing the levels of RFI by a specified variable.
     e.g state, gender
@@ -53,20 +55,22 @@ def plot_fies_levels_by_vars(grp_df, var="state", kind="bar", figsize=(7, 4), **
     Parameters:
     - grp_df (DataFrame): The input DataFrame containing variable and the weighted percent levels of RFI.
     - var (str): The column name representing the variable to group by (default is "state").
-    - **kwargs: Additional keyword arguments for customization.
-        - title (str): Title of the plot.
+    - sorby_col (str): Column to sort by
+    - title (str): Title of the plot.
+    - kind (str): e.g. `bar` or `barh`
+    - figsize (tuple): Size of the plot
 
     Returns:
     - None
     """
     # Sort the bar in descending order
-    grp_df.sort_values("prob_mod_sev", inplace=True, ascending=False)
+    grp_df.sort_values(sortby_col, inplace=True, ascending=False)
 
     ax = grp_df.plot(kind=kind, figsize=figsize)
     ax.set_xlabel("")
     plt.ylabel("Percentage (%)")
     # Remove y_label
-    ax.set_title(kwargs["title"])
+    ax.set_title(title)
     plt.legend(title="RFI Level", bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.xticks(rotation=0)
 
