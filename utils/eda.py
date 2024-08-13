@@ -47,7 +47,7 @@ def fies_by_socio_demo(df, col, FI_mod_sev="prob_mod_sev", FI_sev="prob_sev", wt
 # Plot the RFI levels by different variables such as state, gender etc
 # Usage: grp_df = fies_by_socio_demo.groupby(["zone", "RFI_level"], observed=True)["percentage"].sum().unstack()
 # This function works with the output of the function above `fies_by_socio_demo`
-def plot_fies_levels_by_vars(grp_df, var="state", sortby_col="prob_mod_sev", kind="bar", figsize=(7, 4), title=None):
+def plot_fies_levels_by_vars(grp_df,sortby_col, var="state",  kind="bar", figsize=(7, 4), title=None):
     """
     Plot barplot showing the levels of RFI by a specified variable.
     e.g state, gender
