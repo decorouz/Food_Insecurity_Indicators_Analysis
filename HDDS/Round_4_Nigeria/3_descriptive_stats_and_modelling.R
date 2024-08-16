@@ -123,7 +123,7 @@ design.hdds <- svydesign(id=~1, weights=~weight_final, data=hdds_data)
 design.hdds %>% 
   tbl_svysummary(
     # Use a character variable here. A factor leads to an error
-    by = state,
+    # by = state,
     # Use include to select variables
     include = c(state, crp_landsize_ha,land_size_normalized,
                 hh_size, tot_income, tot_income_dollar,
