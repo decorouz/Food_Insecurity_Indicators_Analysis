@@ -15,6 +15,10 @@ The downloaded data include survey data from **MICS** or NICS. For this project 
 * The dataset contains data from two seperate surveys (MICS and NCIS). We filter by **MICS** survey only.
 * Women, men, and children data merged with the household dataset.
 * After initial data preprocessing, we reduced the variables from over 300 variables to 34.
+<center>
+<img src="assets/image.png" width="400" />
+<figcaption style="font-size: 10px; font-style: italic;">Fig. 1: Weighted composition of urban househld by geopolitical zone in the dataset</figcaption>
+</center>
         
 ## Predictors/Explanatory Variables
 The explanatory variables used in the analysis were selected based on a comprehensive review
