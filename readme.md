@@ -8,7 +8,7 @@ Billions of people suffer from food insecurity. What does it mean to be food ins
 
 # Overview
 
-This projects aim to analyze various food insecurity indicators, including the Household Dietary Diversity Score (HDDS), the Food Insecurity Experience Scale (FIES), and the Minimum Dietary Diversity Score for Children (MDDS). By leveraging data science techniques and Python/R libraries, this projects will provide insights into food insecurity patterns in urban and rural households in Nigeria.
+These project aim to analyze various food insecurity indicators, such as the Household Dietary Diversity Score (HDDS), the Food Insecurity Experience Scale (FIES), and the Minimum Dietary Diversity Score for Children and women (MDDS). By leveraging data science techniques and Python/R libraries, these projects will provide insights into food insecurity patterns in urban and rural households in Nigeria.
 
 
 ## Source Data
@@ -50,7 +50,7 @@ This projects aim to analyze various food insecurity indicators, including the H
 
 
 # Keywords
-Zero Hunger, Data Collection, Data Analysis, Statistical Inferences
+Zero Hunger, Data Collection, Data Analysis, Statistical Inferences, Rasch Model, FIES, Food Insecurity
 
 # Acknowledgments/References
 > * Hannah Ritchie (2023) - “How is food insecurity measured?” Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/food-insecurity' [Online Resource]
