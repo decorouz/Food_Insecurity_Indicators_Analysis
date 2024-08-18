@@ -1,24 +1,54 @@
 # Determinants of Household Food Insecurity Amongst Urban Household in Nigeria
-A multilvel multinorminal logistic regression and mixed effect analysis to assess factors associated with household food insecurity in Urban Nigeria
+A multilvel multinorminal logistic regression and mixed effect analysis to assess factors associated with household food insecurity in Urban Nigeria.
+
+**Multilevel models (MLMs)** are frequently used in social and health sciences where data are typically hierarchical in nature. However, the commonly used hierarchical linear models (HLMs) are appropriate only when the outcome of interest is normally distributed. When you are dealing with outcomes that are not normally distributed (binary, categorical, ordinal), a transformation and an appropriate error distribution for the response variable needs to be incorporated into the model. Therefore, hierarchical generalized linear models (HGLMs) need to be used.
+
+We are interested in modelling the food security status (moderate or severe, severe, secure-moderate-severe levels) of individual urban housholds (level-1) nested within clusters(level-2). In the dichotomous case (moderate or/and severe). The primary interest of the current study is to investigate the impact of certain individual- and household-level variables on a household likelihood of being moderate or/and severely food insure.
+
+The models fitted include;
+* Null model: Model containing no predictors
+* Model I: Model containing only individual/household-level predictors
+* Model II: Model containing only community-level predictors
+* Model III: Model containing both individual-houshold and community-level predictors.
+
+<!-- The general equation of the random intercepts two-level multinomial logistic regression
+model used for analysis of predictors of FI takes the form. -->
+
+### Research Questions for Binary (Dichotomous outcome)
+1. What is the food insecurity status for household in Nigeria.
+2. Do food insecurity status vary across community level (clusters)?
+3. What is the relationship between individual/household characteristic and the likelihood of being moderately or/and severely FI while controlling for individual/household and community characteristics?
+4. What is the relationship between community level(cluster) and the likelihood of being moderately or/and severely FI while controlling indidual/houshold and community characteristics?
+
+
+### Research Questions for Polytomous outcome
+
+1. What is the likelihood of being moderate(FI=2) or severe(FI=3) for household in Nigeria
+2. Does the likelihood of being being moderate(FI=2) or severe(FI=3) vary across communities(clusters).
+3. What is the relationship between individual/household characteristics and the likelihood of being moderately or severely FI.
+4. What is the relationship between community level characteristic and the likelihood of households being moderately or/and severely FI.
+
 
 ## Data
 This study is based on quantitative cross-sectional data derived from the Nigeria 2021 Multiple Indicator Cluster Survey (MICS6), which is a nationally representative survey that collects sociodemographic and health indicators from both household, males and females aged 15–49 years.
 
 The survey utilized a multistage stratified cluster sampling approach that employed a probability proportional to size to select enumeration areas in the first stage based on the 2006 Population and Housing Census of the Federal Republic of Nigeria (NPHC). In the second stage, 20 households were randomly selected within each enumeration area.
 
-The downloaded data include survey data from **MICS** or NICS. For this project we shall use the MICS only.
+The downloaded data from [[4]](https://mics.unicef.org/surveys) include survey data from **MICS** or NICS. For this project we shall use the MICS only.
 
-
-## Data Processing/Cleaning
-* The original household dateset(`hh`) comprises of 41532 dataset.
-* Of these households, `33631` household didn't provide content.
-* The dataset contains data from two seperate surveys (MICS and NCIS). We filter by **MICS** survey only.
-* Women, men, and children data merged with the household dataset.
-* After initial data preprocessing, we reduced the variables from over 300 variables to 34.
 <center>
 <img src="assets/image.png" width="400" />
 <figcaption style="font-size: 10px; font-style: italic;">Fig. 1: Weighted composition of urban househld by geopolitical zone in the dataset</figcaption>
 </center>
+
+## Data Processing/Cleaning
+* The original household dateset(`hh`) comprises of 41532 dataset.
+* nested within 1,850 clusters
+* The dataset contains data from two seperate surveys (MICS and NCIS). We filter by **MICS** survey, **URBAN** area and household who provided consent only.
+* Women(wm), men(mn), and children(ch) data is merged with the household(hh) dataset.
+* After data preprocessing, we proceed with modeling with only 10680 records and 36 variables.
+
+
         
 ## Predictors/Explanatory Variables
 The explanatory variables used in the analysis were selected based on a comprehensive review
@@ -102,5 +132,5 @@ ment Index (HDI). Curr Dev Nutr. 2021; 5(4):nzab017.](https://pubmed.ncbi.nlm.ni
 3. [Ujah OI, Olaore P, Ogbu CE, Okopi J-A, Kirby RS (2023) Prevalence and determinants of
 food insecurity among pregnant women in Nigeria: A multilevel mixed effects analysis. PLOS Glob
 Public Health 3(10): e00023](https://doi.org/10.1371/journal.pgph.0002363)
-
+4. [United Nations Children's Fund (UNICEF). Nigeria - Multiple Indicator Cluster Survey 2021, Round 6 (MICS 2021). Ref: NGA_2021_MICS_v01_M. Downloaded from https://mics.unicef.org/surveys on 09 July, 2024](https://mics.unicef.org/surveys)
 
