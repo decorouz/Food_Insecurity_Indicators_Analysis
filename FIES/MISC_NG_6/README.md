@@ -111,6 +111,12 @@ assess the association between individual-/household-s level and community-level
 teristics with FI. We estimated and reported both fixed effects and random effects to mea-
 sure the associations and variations, respectively.
 
+
+Our data comprises of J clusters, with a different number of household $n_j$ in each cluster. On
+the houshold level, we have the outcome variable 'Food Insecurity' (`fies_rawsocre`), measured by a scale
+that ranges from 0 to 8. We have 8 explanatory variables on
+the houshold level: as identified above and two cluster level explanatory variables `zone` (6 geopolitical area) and cluster(community) level wealth index or poverty computed by aggregating the wealth index score within cluster.
+
 ## Results
 The prevalence FI among urban household in Nigeria was high as determined by the Rasch model (at 75% mean reliance), with nearly 67% of the respondents reporting moderate to severe FI in the past 12 months (95% CI = 66.3%-70.8%) with 41.5 % at severe level of FI in 2021.
 
