@@ -105,20 +105,60 @@ that he or she will respond affirmatively to each item.
 4. All items are equally strongly related to the latent trait of food insecurity and differ only in severity.
 
 
+#### Results from Rasch Model Analysis
+The prevalence FI among urban household in Nigeria was high as determined by the Rasch model (at 75% mean reliance), with nearly 67% of the respondents reporting moderate to severe FI in the past 12 months (95% CI = 66.3%-70.8%) with 41.5 % at severe level of FI in 2021.
+
+
 ## Modelling
-Several weighted multilevel multinomial logistic regression models were fitted to
+Several weighted **multilevel** multinomial logistic regression models were fitted to
 assess the association between individual-/household-s level and community-level charac-
 teristics with FI. We estimated and reported both fixed effects and random effects to mea-
 sure the associations and variations, respectively.
 
 
-Our data comprises of J clusters, with a different number of household $n_j$ in each cluster. On
-the houshold level, we have the outcome variable 'Food Insecurity' (`fies_rawsocre`), measured by a scale
-that ranges from 0 to 8. We have 8 explanatory variables on
+We will begin by fitting a null or empty two-level model, that is a model with only
+an intercept and community(cluster) reffects. 
+
+
+$$\log\left(\frac{\pi_{ij}}{1 - \pi_{ij}}\right) = \beta_j +  u_{oj}$$
+
+
+The intercept $\beta_0$ is shared by all communities(clusters) while the random effect $u_{oj}$ is
+specific to community $j$. The random effect is assumed to follow a normal
+distribution with variance $\sigma^2_{u0}$
+
+
+From the model estimates (using Laplacian approximation and Adaptive Gauss-Hermite Quadrature), we see that the log-odds of a household being Moderate or Severely FI in an 'average' cluster (one with $u_{0j}$ = 0) is estimated as $\hat{\beta}_{0}$ = 0.99681. The intercept for cluster $j$ is 0.99681 + $u{0j}$, where the variance of $u{0j}$ is estimated as $\sigma^2_{u0}$ = 0.6272.
+
+```R
+%%R
+fita <- glm(MSI ~ 1, data = data, weights =hhweightmics,  family = binomial("logit"))
+
+logLik(fita)-logLik(fit)
+> 'log Lik.' -398.9647 (df=1)
+```
+The test statistic is 797.9294 (-2*(-398.9647)) with 1 degree of freedom, so there is
+strong evidence that the between-community variance is non-zero.
+
+
+
+The likelihood ratio statistic for testing null hypothesis that $\sigma^2_{u0}$ = 0, can be calculated by comparing the two-level mode, with the corresponding single-level model without the level 2 random effects.
+<center>
+<img src="assets/estimated_residual.png" width="400" />
+<figcaption style="font-size: 10px; font-style: italic;">Estimated residuals for all 575 communities (clusters) in the sample (urban area)</figcaption>
+</center>
+
+
+
+The plot shows the estimated residuals for all 575 communities (clusters) in the sample (urban area). For a substantial number of communities, the 95% confidence interval does not overlap the horizontal line at zero, indicating that Moderate or Severe FI in these communities is significantly above average (above the zero line) or below average (below the zero line).
+
+### Model Building Strategy
+>Our data comprises of J clusters, with a different number of household $n_j$ in each cluster. On
+the houshold level, we have the outcome variable 'Food Insecurity' (**Y**), measured by a scale
+that ranges from 0 to 8. We have 8 explanatory variables (**X**) on
 the houshold level: as identified above and two cluster level explanatory variables `zone` (6 geopolitical area) and cluster(community) level wealth index or poverty computed by aggregating the wealth index score within cluster.
 
-## Results
-The prevalence FI among urban household in Nigeria was high as determined by the Rasch model (at 75% mean reliance), with nearly 67% of the respondents reporting moderate to severe FI in the past 12 months (95% CI = 66.3%-70.8%) with 41.5 % at severe level of FI in 2021.
+
 
 <!-- Multivariate analysis revealed that higher parity, households with 5 or more members, household wealth index,
 urban residence, and community-level poverty were significantly associated with FI. Our
