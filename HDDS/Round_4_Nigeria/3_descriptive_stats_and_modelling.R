@@ -8,6 +8,9 @@ library(dplyr)
 library(tidyverse)
 library(survey)
 library("haven")
+library(broom)
+library(knitr)
+library(kableExtra)
 
 
 #--------- Load the data ----------------------
@@ -305,13 +308,9 @@ summary(hdds_poison, df.resid = degf(design.hdds))
 library(car)
 vif_values <- vif(hdds_poison)
 #----------------- Tidy the model summary
-library(broom)
-library(knitr)
-library(dplyr)
-library(kableExtra)
-
 
 tidy_hdds<- tidy(hdds_poison)
+
 
 # Add asterisks for different significance levels and combine estimate and standard error with HTML line breaks
 tidy_hdds <- tidy_hdds %>%
@@ -404,10 +403,30 @@ design.hdds <- svydesign(id=~1, weights=~weight_final, data=hdds_data)
 
 # 
 # ---------------- Multivariate Rgression with Specific food group as dependent variables --
-library(broom)
-library(knitr)
-library(dplyr)
-library(kableExtra)
+
+
+# str(hdds_data$hdds_fish)
+# 
+# model_1 <- glm(hdds_fish ~
+#                 state+
+#                 hh_age+
+#                 hh_size +
+#                 hh_agricactivity +
+#                 hh_gender +
+#                 hh_education+
+#                 land_size_normalized+
+#                 income_dollar_normalized +
+#                 FI_0_6 +
+#                 shock_climate,
+#                 na.action = na.omit,
+#                 # weights = weight_final,
+#                 data = hdds_data, family = "binomial")
+# 
+# model_1 %>% 
+#   tbl_regression(exponentiate = TRUE)
+
+library(survey)
+library(gt)
 
 # hdds_meat
 # hdds_eggs
@@ -416,27 +435,44 @@ library(kableExtra)
 # hdds_fruits
 # hdds_milkdairy
 
-str(hdds_data)
+# omit na 
+clean_data <- na.omit(hdds_data) 
 
-model_1 <- glm(hdds_milkdairy ~
-                state+
-                hh_age+
-                hh_size +
-                land_size_normalized+
-                relevel(hh_agricactivity, ref="No") +
-                hh_gender +
-                 relevel(hh_education, ref="No Education") +
-                land_size_normalized+
-                income_dollar_normalized +
-                FI_0_6 +
-                shock_climate,
-                na.action = na.omit,
-                weights = weight_final,
-                data = hdds_data, family = "binomial")
+clean_data$hdds_meat <- as.numeric(as.character(clean_data$hdds_meat))
+clean_data$hdds_fish <- as.numeric(as.character(clean_data$hdds_fish))
+clean_data$hdds_eggs <- as.numeric(as.character(clean_data$hdds_eggs))
+clean_data$hdds_legumes <- as.numeric(as.character(clean_data$hdds_legumes))
+clean_data$hdds_fruits <- as.numeric(as.character(clean_data$hdds_fruits))
+clean_data$hdds_milkdairy <- as.numeric(as.character(clean_data$hdds_milkdairy))
+
+# 1. Design the Survey 
+# (Assuming your data is in a data frame called 'my_data')
+my_design <- svydesign(id = ~1, 
+                       weights = ~weight_final, 
+                       data = clean_data)
+
+
+
+# 2. Fit a Model (Example: Regression)
+model <- svyglm(hdds_milkdairy ~
+                  state+
+                  hh_age+
+                  hh_size +
+                  hh_agricactivity +
+                  hh_gender +
+                  hh_education+
+                  land_size_normalized+
+                  income_dollar_normalized +
+                  FI_0_6 + shock_climate,
+                design = my_design)
+model %>% 
+  tbl_regression(exponentiate = TRUE)
+
 
 
 # Tidy the model summary
 tidy_log_model <- tidy(model_1)
+tidy_log_model
 
 # Add asterisks for different significance levels and combine estimate and standard error with HTML line breaks
 tidy_log_model <- tidy_log_model %>%
