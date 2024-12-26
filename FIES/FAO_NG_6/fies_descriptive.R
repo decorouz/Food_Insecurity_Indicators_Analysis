@@ -1,4 +1,4 @@
-setwd("~/Documents/Dev/Python Programming/Data Science/data_science_with_python")
+setwd("~/Documents/Dev/Python Programming/Data Science/data_science_with_python/FIES")
 
 # Load the neccessary libraries
 library(gtsummary)
@@ -11,6 +11,7 @@ library(survey)
 
 fies_data$FI_cat <- factor(fies_data$FI_0_6)
 fies_data$FI_cat_03 <- factor(fies_data$FI_0_3)
+fies_data$dichotomized_prob_sev <- factor(fies_data$dichotomized_prob_sev)
 
 # Add Labels
 attributes(fies_data$hh_agricactivity)$label <- "HH Agricultural Activity"
@@ -30,21 +31,23 @@ attributes(fies_data$shock_plantdisease)$label <- "Shock from plant disease"
 attributes(fies_data$shock_animaldisease)$label <- "Shock from animal disease"
 attributes(fies_data$shock_violenceinsecconf)$label <- "Shock from conflict"
 attributes(fies_data$rcsi_class)$label <- "Coping Strategy"
+attributes(fies_data$wealth_quintile)$label <- "Wealth quintile"
 # attributes(fies_data$hh_wealth_light2)$label <- "Access to Electricity"
 # attributes(fies_data$hh_wealth_water2)$label <- "Access to Safe Water"
 # attributes(fies_data$hh_wealth_toilet2)$label <- "Access to Sanitation"
 attributes(fies_data$FI_cat)$label <- "Food insecurity 1"
 attributes(fies_data$FI_cat_03)$label <- "Food insecurity 2"
 attributes(fies_data$fies_cat2)$label <- "Food insecurity categories"
+attributes(fies_data$dichotomized_prob_sev)$label <- "Food insecurity probalistic cat"
 
 # Select the column of interest
 col_of_interest <- fies_data %>% select(state,crp_landsize_ha, hh_size, hh_gender,hh_age,
-                              hh_agricactivity, hh_education,hh_maritalstat_clean,
-                              income_main_cat, income_more_than_one, income_main_control,
+                              hh_agricactivity, hh_education, hh_maritalstat_clean,
+                              income_main_cat, income_more_than_one, income_main_control,wealth_quintile,
                               rcsi_class, shock_higherfoodprices, shock_drought,
                               shock_flood, shock_plantdisease, shock_animaldisease,
                               shock_violenceinsecconf,
-                              FI_cat, fies_cat2)
+                              FI_cat, fies_cat2, dichotomized_prob_sev)
 # Survey desgin
 design.fies <- svydesign(id=~1, weights=~weight_final, data=fies_data)
 

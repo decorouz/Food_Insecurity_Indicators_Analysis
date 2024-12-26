@@ -1,4 +1,4 @@
-setwd("~/Documents/Dev/Python Programming/Data Science/data_science_with_python")
+setwd("~/Documents/Dev/Python Programming/Data Science/data_science_with_python/FIES")
 
 # Import the necessary libraries
 
@@ -16,7 +16,7 @@ library(dplyr)
 
 
 # Load the data 
-fies_data <- read.csv("data/DIEM_NG/26052024_model_ready_data.csv")
+fies_data <- read.csv("../FIES/FAO_NG_6/data/26052024_model_ready_data.csv")
 
 
 # Categorize rawscore to 0-3, 4-6, 7-8
@@ -113,19 +113,46 @@ fies_data$hh_education <- relevel(fies_data$hh_education, ref = "No Education")
 
 fies_data$income_main_cat <- relevel(fies_data$income_main_cat, ref = "No Employment")
 
+fies_data$land_by_hh_size<- fies_data$crp_landsize_ha / fies_data$hh_size
+
+model_ds <- fies_data[c("dichotomized_prob_sev", 
+            "state",
+            "hh_size",
+            "hh_age",
+            "crp_landsize_ha",
+            "land_by_hh_size",
+            "hh_agricactivity",
+            "hh_gender",
+            "hh_education",
+            "income_main_cat",
+            "income_more_than_one",
+            "income_main_control",
+            "wealth_quintile",
+            "hh_maritalstat_clean",
+            "shock_higherfoodprices",
+            "shock_drought",
+            "shock_flood",
+            "shock_plantdisease",
+            "shock_animaldisease",
+            "shock_violenceinsecconf",
+            "weight_final")]
+# clean_data <- na.omit(model_ds)
+
 tbl_uv_ex1 <-
   tbl_uvregression(
-    fies_data[c("FI_0_6", "state",
+    fies_data[c("dichotomized_prob_sev", 
+                "state",
                 "hh_size",
+                "hh_age",
                 "crp_landsize_ha",
+                "land_by_hh_size",
                 "hh_agricactivity",
-                # "relevel(hh_agricactivity, ref='No')",
                 "hh_gender",
                 "hh_education",
                 "income_main_cat",
-                # "relevel(income_main_cat, ref='No Employment')",
                 "income_more_than_one",
                 "income_main_control",
+                "wealth_quintile",
                 "hh_maritalstat_clean",
                 "shock_higherfoodprices",
                 "shock_drought",
@@ -134,53 +161,86 @@ tbl_uv_ex1 <-
                 "shock_animaldisease",
                 "shock_violenceinsecconf")],
     method = glm,
-    y = FI_0_6,
-    method.args = list(family = binomial, weights = fies_data$weight_final,na.action = na.omit ),
+    y = dichotomized_prob_sev,
+    method.args = list(family = binomial, weights = fies_data$weight_final,
+                       # na.action = na.omit 
+                       ),
     exponentiate = TRUE
   ) %>% 
   bold_labels()
 tbl_uv_ex1
 
 
-model_06 <- glm(FI_0_6 ~
-                  state+
-                  # hh_size +
-                  crp_landsize_ha +
-                  hh_agricactivity+
-                  hh_gender +
-                  hh_education +
-                  # income_main_cat2+
-                  # # relevel(income_main_cat2, ref="Not Agric Employed")+
-                  # # relevel(income_main_cat, ref="No Employment")+
-                  income_more_than_one +
-                  income_main_control+
-                  # hh_maritalstat_clean +
-                  shock_higherfoodprices +
-                  
-                  shock_drought + 
-                  # shock_flood +
-                  shock_plantdisease +
-                  shock_animaldisease +
-                  shock_violenceinsecconf,
-              na.action = na.omit,
-              weights = weight_final,
-              data = fies_data, family = "binomial")
+# ------------------ Multivariate Logistic Regression ------------
 
+model_prob <- glm(dichotomized_prob_sev ~ state + 
+                    hh_size +
+                    hh_age +
+                    crp_landsize_ha +
+                    # land_by_hh_size+
+                    hh_agricactivity + 
+                    hh_gender +
+                    hh_education +
+                    income_more_than_one +
+                    C(income_main_control) +
+                    hh_maritalstat_clean + 
+                    # shock_higherfoodprices +
+                    shock_drought + 
+                    shock_plantdisease +
+                    shock_animaldisease +
+                    shock_violenceinsecconf,
+                  na.action = na.omit,
+                  weights = weight_final,
+                  data = fies_data, family = "binomial")
 
-tbl_regression(model_06, exponentiate = TRUE)
+tbl_regression(model_prob, exponentiate = TRUE)
 
 
 ## ---------------- Omnibus Test -----------------
 
+
 # Fit the null model (intercept only)
-null_model <- glm(FI_0_6 ~ 1, data = fies_data, family = binomial)
+null_model <- glm(dichotomized_prob_sev ~ 1, data = clean_data, family = binomial)
+
 
 # Perform the omnibus test using the likelihood ratio test
-anova(null_model, model_06, test = "Chisq")
-
+anova(null_model, model_prob, test = "Chisq")
 
 ## ------------------------ No Multicollinearity -------------------
-vif(model_06)
+vif(model_prob)
+
+
+# model_06 <- glm(dichotomized_prob_sev ~
+#                   state+
+#                   # hh_size +
+#                   crp_landsize_ha +
+#                   hh_agricactivity+
+#                   # wealth_quintile +
+#                   hh_gender +
+#                   # hh_age + 
+#                   hh_education +
+#                   # income_main_cat2+
+#                   # # relevel(income_main_cat2, ref="Not Agric Employed")+
+#                   # # relevel(income_main_cat, ref="No Employment")+
+#                   income_more_than_one +
+#                   income_main_control+
+#                   # hh_maritalstat_clean +
+#                   shock_higherfoodprices +
+#                   shock_drought + 
+#                   # shock_flood +
+#                   shock_plantdisease +
+#                   shock_animaldisease +
+#                   shock_violenceinsecconf,
+#               na.action = na.omit,
+#               weights = weight_final,
+#               data = fies_data, family = "binomial")
+# tbl_regression(model_06, exponentiate = TRUE)
+
+
+
+
+
+
 
 
 
@@ -198,29 +258,29 @@ fies_data$rcsi_rad <- factor(ifelse(fies_data$rcsi_restrict_adult_consumpt > 0, 
                              levels = c(0, 1), labels = c("No", "Yes"))
 
 # Create a contingency table
-rcsi_tab_1 = table(fies_data$rcsi_lpf, fies_data$FI_0_6)
+rcsi_tab_1 = table(fies_data$rcsi_lpf, fies_data$dichotomized_prob_sev)
 
 chisq.test(rcsi_tab_1)
 
-rcsi_tab_2 = table(fies_data$rcsi_bf , fies_data$FI_0_6)
+rcsi_tab_2 = table(fies_data$rcsi_bf , fies_data$dichotomized_prob_sev)
 chisq.test(rcsi_tab_2)
 rcsi_tab_2
 
-rcsi_tab_3 = table(fies_data$rcsi_rdm, fies_data$FI_0_6)
+rcsi_tab_3 = table(fies_data$rcsi_rdm, fies_data$dichotomized_prob_sev)
 chisq.test(rcsi_tab_3)
 
-rcsi_tab_4 = table(fies_data$rcsi_lp, fies_data$FI_0_6)
+rcsi_tab_4 = table(fies_data$rcsi_lp, fies_data$dichotomized_prob_sev)
 chisq.test(rcsi_tab_4)
 
-rcsi_tab_5 = table(fies_data$rcsi_rad, fies_data$FI_0_6)
+rcsi_tab_5 = table(fies_data$rcsi_rad, fies_data$dichotomized_prob_sev)
 chisq.test(rcsi_tab_5)
 
 
 
 tbl <-
   fies_data %>%
-  select(rcsi_lpf, rcsi_bf, rcsi_rdm, rcsi_lp, rcsi_rad, FI_0_6) %>%
-  tbl_summary(by = FI_0_6) %>%
+  select(rcsi_lpf, rcsi_bf, rcsi_rdm, rcsi_lp, rcsi_rad, dichotomized_prob_sev) %>%
+  tbl_summary(by = dichotomized_prob_sev) %>%
   add_p(test = all_categorical() ~ "chisq.test") %>%
   # add a header to the statistic column, which is hidden by default
   # adding the header will also unhide the column
