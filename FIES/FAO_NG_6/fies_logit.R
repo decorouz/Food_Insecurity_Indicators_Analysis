@@ -184,8 +184,9 @@ model_prob <- glm(dichotomized_prob_sev ~ state +
                     income_more_than_one +
                     C(income_main_control) +
                     hh_maritalstat_clean + 
-                    # shock_higherfoodprices +
+                    shock_higherfoodprices +
                     shock_drought + 
+                    shock_flood +
                     shock_plantdisease +
                     shock_animaldisease +
                     shock_violenceinsecconf,

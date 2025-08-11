@@ -75,11 +75,11 @@ design.fies %>%
     # Use include to select variables
     include = c(state, crp_landsize_ha, hh_size,hh_age,
                 hh_agricactivity, hh_education,hh_maritalstat_clean,hh_gender,
-                income_main_cat, income_more_than_one,income_main_control,
+                income_main_cat, income_more_than_one,income_main_control,wealth_quintile,
                 shock_higherfoodprices, rcsi_class, shock_drought,
                 shock_flood, shock_plantdisease, shock_animaldisease,
                 shock_violenceinsecconf,
-                FI_cat, fies_cat2),
+                FI_cat, fies_cat2, dichotomized_prob_sev),
     statistic = list(all_continuous()  ~ "{mean} ± {sd}",
                      all_categorical() ~ "{n}    ({p}%)"),
     digits = list(all_categorical() ~ c(0, 1)),
